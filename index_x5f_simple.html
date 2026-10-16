@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Eko Hustle</title><style>*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a0a;color:#fff;font-family:system-ui;min-height:100vh}.hero{background:linear-gradient(135deg,#ff6a00,#ffcc00);padding:30px 15px;text-align:center;color:#000}.hero h1{font-size:32px;font-weight:900}.container{max-width:600px;margin:0 auto;padding:15px}.card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:15px;margin:12px 0}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:15px 0}.stat{background:#222;border-radius:10px;padding:10px;text-align:center;border:1px solid #333}.stat b{color:#ffcc00;font-size:18px;display:block}.btn{width:100%;padding:14px;border-radius:10px;border:none;font-weight:800;font-size:15px;cursor:pointer;margin:6px 0}.btn-primary{background:#ffcc00;color:#000}.btn-secondary{background:#2a2a2a;color:#fff;border:1px solid #3a3a3a}.log{background:#111;border-radius:8px;padding:10px;height:100px;overflow-y:auto;font-size:12px;color:#aaa;border:1px solid #222}.choice{display:block;width:100%;text-align:left;padding:12px;background:#222;border:1px solid #333;border-radius:8px;color:#fff;margin:6px 0;cursor:pointer}#adminPanel{display:none;background:linear-gradient(135deg,#111,#222);border:2px solid gold;border-radius:12px;padding:15px;margin:12px 0}.adminBtn{background:gold;color:#000;padding:10px;border-radius:8px;border:none;font-weight:800;margin:4px;width:48%;cursor:pointer}</style></head><body>
+<div class="hero" onclick="tapLogo()"><h1 id="logo">EKO HUSTLE</h1><p>From Danfo to Lambo • Lagos Big Boy Simulator</p><span id="badge" style="background:#000;color:#ffcc00;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:800">DAY <span id="day">1</span>/100</span></div>
+<div class="container">
+<div class="stats"><div class="stat"><span>💰 CASH</span><b id="cash">₦15,000</b></div><div class="stat"><span>⚡ ENERGY</span><b id="energy">100%</b></div><div class="stat"><span>⭐ REP</span><b id="rep">0</b></div></div>
+<div id="adminPanel"><h3>👑 BOSS ADMIN PANEL</h3><p style="color:gold;font-size:12px">Only you see this! Secret code: beecee2026</p><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:10px"><button class="adminBtn" onclick="addMoney(1000000)">+ ₦1M</button><button class="adminBtn" onclick="addMoney(10000000)">+ ₦10M</button><button class="adminBtn" onclick="addMoney(1000000000)">+ ₦1B</button><button class="adminBtn" onclick="state.rep+=20;update()">+ 20 REP</button><button class="adminBtn" onclick="state.energy=100;update()">Full Energy</button><button class="adminBtn" onclick="if(confirm('Reset?')){localStorage.clear();location.reload()}">Reset Game</button></div></div>
+<div class="card"><div id="loc" style="font-size:20px;font-weight:900;margin-bottom:8px">📍 Ojuelegba Under Bridge</div><p id="desc" style="color:#999;font-size:13px;margin-bottom:8px">You just landed Lagos with ₦15k. No apartment. No food. Just street sense. Eko oni baje!</p><div id="choices"></div></div>
+<div class="card"><h3 style="margin-bottom:8px">📒 Street Log</h3><div class="log" id="log"><div>> You waka enter Lagos. Eko oni baje!</div></div><button class="btn btn-secondary" onclick="nextDay()">😴 Sleep → Next Day (Save)</button></div>
+<div class="card" style="text-align:center;background:linear-gradient(135deg,#111,#222)"><h3>🔥 YOUR REAL GAME LINK</h3><p style="color:#888;font-size:12px;margin:8px 0">Share this to players:<br><b style="color:#ffcc00">beeceetechstudyacademy.github.io/Eko-Hustle/</b></p><button class="btn btn-primary" onclick="navigator.clipboard.writeText('https://beeceetechstudyacademy.github.io/Eko-Hustle/');alert('Link copied! Share on WhatsApp!')">Copy Game Link</button><p style="color:#666;font-size:11px;margin-top:8px">Admin link (only you): ?admin=beecee2026</p></div>
+</div>
+<script>
+let tapCount=0;function tapLogo(){tapCount++;if(tapCount>=7){document.getElementById('adminPanel').style.display='block';log('> 👑 ADMIN MODE ACTIVATED! You be boss!');tapCount=0}setTimeout(()=>tapCount=0,3000)}
+let state=JSON.parse(localStorage.getItem('ekoSave'))||{day:1,cash:15000,energy:100,rep:0,location:"Ojuelegba",hunger:80};
+const locations={
+"Ojuelegba":{desc:"Hot sun dey. Danfo dey shout. Small jobs full ground.",choices:[
+{text:"🚌 Load bus for conductor - Earn ₦2k",action:()=>{gain(2000,-15,1,'You help conductor shout Oshodi!') }},
+{text:"🍟 Buy Gala + La Casera - ₦500",action:()=>{spend(500,10,0,'Gala sweet, you don chop small.') }},
+{text:"👀 Go Yaba - Look for better hustle",action:()=>{move("Yaba")}}
+]},
+"Yaba":{desc:"Yaba! Tech guys full here. You see one guy with laptop.",choices:[
+{text:"💻 Learn Yahoo Yahoo format? (Risky)",action:()=>{if(Math.random()>0.6){gain(8000,-20,5,'Client pay! $50 don enter!')}else{spend(3000,-20,-2,'EFCC nearly catch you! You run!')}}},
+{text:"👕 Sell thrift Okrika - ₦5k profit",action:()=>{gain(5000,-20,2,'You sell 3 shirts for Yabatech students.')}},
+{text:"🏃 Go to Lekki - Big boys area",action:()=>{if(state.rep>5){move("Lekki")}else{log('> Gateman stop you: Oga you no get invite! Build Rep for Yaba first!')}}}
+]},
+"Lekki":{desc:"Lekki Phase 1! Range Rover dey pass. Owambe loading!",choices:[
+{text:"🕺 Enter Owambe Party - Spray ₦10k to gain Rep",action:()=>{if(state.cash>=10000){spend(10000,-10,10,'You spray for party! Big boys notice you!')}else{log('> No money to spray!')}}},
+{text:"🏠 View 1-Bed Selfcontain - ₦800k/year",action:()=>{log('> Agent: Oga bring 800k + 200k agreement + 100k commission = 1.1M!')}},
+{text:"💼 Pitch Business Idea to Big Man",action:()=>{gain(20000,-10,8,'Big man like your ginger! He invest small.')}},
+{text:"🚐 Back to Ojuelegba",action:()=>{move("Ojuelegba")}}
+]}
+};
+function gain(c,e,r,msg){state.cash+=c;state.energy+=e;state.rep+=r;log('> '+msg+' '+(c>0?'+₦'+c:'-₦'+Math.abs(c)));update();render()}
+function spend(c,e,r,msg){if(state.cash<c){log('> No money!');return}state.cash-=c;state.energy+=e;state.rep+=r;log('> '+msg+' -₦'+c);update();render()}
+function move(l){state.location=l;render()}
+function log(m){const d=document.createElement('div');d.textContent=m;document.getElementById('log').prepend(d);update()}
+function update(){localStorage.setItem('ekoSave',JSON.stringify(state));document.getElementById('day').textContent=state.day;document.getElementById('cash').textContent='₦'+state.cash.toLocaleString();document.getElementById('energy').textContent=state.energy+'%';document.getElementById('rep').textContent=state.rep;if(state.energy<=0){state.energy=20;state.day++;log('> You faint! You sleep for gutter! Day lost!')}}
+function render(){const l=locations[state.location];document.getElementById('loc').textContent='📍 '+state.location;document.getElementById('desc').textContent=l.desc;const c=document.getElementById('choices');c.innerHTML='';l.choices.forEach(ch=>{const b=document.createElement('button');b.className='choice';b.textContent=ch.text;b.onclick=ch.action;c.appendChild(b)})}
+function nextDay(){state.day++;state.energy=100;localStorage.setItem('ekoSave',JSON.stringify(state));log('> New day! Day '+state.day+' - Eko for show!');update();render()}
+function addMoney(a){state.cash+=a;update();log('> ADMIN: Added ₦'+a.toLocaleString()+'! You don blow!')}
+if(window.location.search.includes('admin=beecee2026')){document.getElementById('adminPanel').style.display='block'}
+update();render();
+</script></body></html>
