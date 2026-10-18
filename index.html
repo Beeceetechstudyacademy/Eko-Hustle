@@ -1,0 +1,255 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eko Hustle - Lagos Lifestyle - Creator Control</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{background:#000;color:#fff;font-family:system-ui;min-height:100vh;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-2;background:#000}.bg div{width:100%;height:100%;background-size:cover;background-position:center;animation:ken 15s infinite alternate;filter:brightness(0.48) saturate(1.15)}
+.overlay{position:fixed;inset:0;z-index:-1;background:linear-gradient(0deg,#000 30%,transparent 75%)}
+.hero{background:linear-gradient(90deg,#ff6a00,#ffcc00);padding:14px;text-align:center;color:#000;position:sticky;top:0;z-index:20;cursor:pointer}
+.container{max-width:560px;margin:0 auto;padding:12px;position:relative;z-index:5}
+.card{background:rgba(20,20,20,0.94);border:1px solid #333;border-radius:16px;padding:14px;margin:10px 0;backdrop-filter:blur(10px)}
+.avatar{width:54px;height:54px;border-radius:50%;object-fit:cover;border:2px solid gold}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#1e1e1e;border-radius:12px;padding:10px;text-align:center;border:1px solid #333}.stat b{color:#ffcc00;display:block;font-size:16px}
+.btn{width:100%;padding:13px;border-radius:12px;border:none;font-weight:900;font-size:14px;cursor:pointer;margin:6px 0}.btn-primary{background:gold;color:#000}.btn-secondary{background:#2a2a2a;color:#fff;border:1px solid #444}
+.choice{display:flex;align-items:center;gap:10px;width:100%;padding:12px;background:#222;border:1px solid #333;border-radius:12px;color:#fff;margin:7px 0;cursor:pointer;text-align:left}
+.choice img{width:44px;height:44px;border-radius:10px;object-fit:cover}.choice:hover{border-color:gold}
+.log{background:#0f0f0f;border-radius:10px;padding:10px;height:120px;overflow-y:auto;font-size:12px;color:#aaa;border:1px solid #222}
+input,textarea,select{width:100%;padding:11px;border-radius:10px;border:1px solid #444;background:#111;color:#fff;margin:5px 0;font-size:14px}
+.energyBar{height:8px;background:#333;border-radius:20px;overflow:hidden;margin-top:6px}.energyFill{height:100%;background:linear-gradient(90deg,#00ff88,#ffcc00);transition:width .6s}
+#adminPanel{display:none;background:linear-gradient(135deg,#1a1500,#2a2000);border:2px solid gold;border-radius:14px;padding:14px;margin:10px 0}
+.adminBtn{background:gold;color:#000;padding:10px;border-radius:8px;border:none;font-weight:800;margin:4px;width:47%;cursor:pointer}
+.adminTab{display:inline-block;padding:8px 12px;background:#222;border-radius:20px;margin:3px;font-size:12px;cursor:pointer;border:1px solid #333}
+.adminTab.active{background:gold;color:#000;font-weight:900}
+.motion{position:fixed;inset:0;z-index:0;pointer-events:none}.danfo{position:absolute;top:22%;font-size:36px;animation:drive 9s linear infinite;filter:drop-shadow(0 0 6px gold)}
+@keyframes drive{0%{left:-30%}100%{left:115%}}@keyframes ken{0%{transform:scale(1)}100%{transform:scale(1.28) translate(-3%,-3%)}}
+/* audio pulse */ .audio-on{animation:pulse 1s infinite} @keyframes pulse{0%{box-shadow:0 0 0 0 gold}70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}</style></head><body>
+
+<!-- AUDIO SYSTEM -->
+<audio id="audioDanfo" preload="auto" src="https://cdn.pixabay.com/download/audio/2022/03/24/audio_5c1dc1a2c7.mp3?filename=car-horn-108365.mp3"></audio>
+<audio id="audioCash" preload="auto" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=cash-register-64334.mp3"></audio>
+<audio id="audioClick" preload="auto" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5b5b8f3e7b.mp3?filename=mouse-click-104737.mp3"></audio>
+<audio id="audioBg" loop preload="auto" src="https://cdn.pixabay.com/download/audio/2022/10/30/audio_3e2d3be7c6.mp3?filename=african-drums-122592.mp3"></audio>
+<div style="position:fixed;bottom:10px;right:10px;z-index:100;background:rgba(0,0,0,0.8);border-radius:20px;padding:6px 10px;border:1px solid gold;display:flex;gap:6px;align-items:center"><span style="font-size:10px">🔊</span><button onclick="toggleAudio()" id="audioBtn" style="background:gold;color:#000;border:none;border-radius:10px;padding:4px 8px;font-size:10px;font-weight:800">Audio OFF</button></div>
+
+<div class="bg"><div id="bgImg"></div></div><div class="overlay"></div>
+<div class="motion"><div class="danfo">🚐💨</div><div class="danfo" style="top:35%;animation-delay:2.8s">🚌 Oshodi! Oshodi! 💨</div><div class="danfo" style="top:50%;animation-delay:5.5s;font-size:20px">🌇 Eko Oni Baje! 💨</div></div>
+<div class="hero" onclick="tapLogo()"><h1>EKO HUSTLE 🎬</h1><p style="font-size:11px">Lagos Lifestyle • From Danfo to Lambo • Creator Control Edition</p><span style="background:#000;color:gold;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:800">DAY <span id="day">1</span> • <span id="locTop">Ojuelegba</span></span></div>
+<div class="container" id="app"></div>
+<script>
+
+let audioEnabled=false;
+function toggleAudio(){
+ audioEnabled=!audioEnabled;
+ const btn=document.getElementById('audioBtn');
+ const bg=document.getElementById('audioBg');
+ if(audioEnabled){btn.textContent='Audio ON 🔊';btn.classList.add('audio-on');bg.volume=0.15;bg.play().catch(()=>{});}else{btn.textContent='Audio OFF 🔇';btn.classList.remove('audio-on');bg.pause();}
+ localStorage.setItem('ekoAudio', audioEnabled?'on':'off');
+}
+function playSound(id){if(!audioEnabled)return;const a=document.getElementById(id);if(a){a.currentTime=0;a.volume=id=='audioCash'?0.6:0.4;a.play().catch(()=>{});}}
+// Restore audio pref
+setTimeout(()=>{if(localStorage.getItem('ekoAudio')=='on')toggleAudio();},800);
+
+// Review system
+function submitReview(){
+ const name=user?user.name:'Anonymous';
+ const rating=document.getElementById('reviewStars')?.value||5;
+ const text=document.getElementById('reviewText')?.value||'';
+ if(!text.trim()){alert('Write small review!');return}
+ let reviews=JSON.parse(localStorage.getItem('ekoReviews')||'[]');
+ reviews.unshift({name,rating,text,day:state.day,location:state.location,cash:state.cash,date:new Date().toLocaleString()});
+ localStorage.setItem('ekoReviews',JSON.stringify(reviews));
+ document.getElementById('reviewText').value='';
+ addLog('> Thanks for review '+name+'! ⭐'+rating);
+ renderReviews();
+}
+function renderReviews(){
+ const box=document.getElementById('reviewsBox');
+ if(!box)return;
+ let reviews=JSON.parse(localStorage.getItem('ekoReviews')||'[]');
+ if(reviews.length==0){box.innerHTML='<p style="color:#666;font-size:11px">No reviews yet - be first!</p>';return}
+ box.innerHTML=reviews.slice(0,10).map(r=>`<div style="background:#111;border-radius:8px;padding:8px;margin:6px 0;font-size:11px"><b>${r.name}</b> ⭐${r.rating} • Day ${r.day} • ${r.location}<br><span style="color:#aaa">${r.text}</span><br><span style="color:#555;font-size:9px">${r.date}</span></div>`).join('')+'<div style="font-size:10px;color:#666;margin-top:6px">'+reviews.length+' total reviews</div>';
+}
+
+let tap=0;function tapLogo(){tap++;if(tap>=7){document.getElementById('adminPanel').style.display='block';addLog('> 👑 CREATOR MODE ACTIVATED! beecee2026');}setTimeout(()=>tap=0,3000)}
+let user=JSON.parse(localStorage.getItem('ekoUser')||'null');
+let state=JSON.parse(localStorage.getItem('ekoSaveV2')||'null');
+let customActivities=JSON.parse(localStorage.getItem('ekoCustomActivities')||'null');
+
+const AV={
+ male:"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=face",
+ female:"https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&h=200&fit=crop&crop=face",
+ conductor:"https://images.unsplash.com/photo-1506277886164-e171db00f4c0?w=200&h=200&fit=crop&crop=face",
+ lekki:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=400&fit=crop"
+};
+
+const DEFAULT_LOCS={
+ Ojuelegba:{desc:"Ojuelegba Under Bridge! Danfo dey shout Oshodi! Hot sun, gala sellers, conductors dey hustle.",bg:"https://images.unsplash.com/photo-1494515843206-f3117d6f51b7?w=800",img:AV.conductor,activities:[
+  {id:"load_bus",name:"Load Bus for Conductor",desc:"Earn ₦2k - Help conductor shout",icon:"🚌",cash:2000,energy:-15,rep:1},
+  {id:"gala",name:"Buy Gala + La Casera",desc:"Chop small - ₦500 - Restore energy",icon:"🍟",cash:-500,energy:10,rep:0},
+  {id:"go_yaba",name:"Waka Go Yaba",desc:"Find better hustle",icon:"👀",cash:0,energy:-5,rep:0,next:"Yaba"}
+ ]},
+ Yaba:{desc:"Yaba! Computer Village! Laptop guys, Okrika sellers, students. Na here hustle upgrade!",bg:"https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800",img:AV.female,activities:[
+  {id:"yahoo",name:"Learn Yahoo Format? (Risky)",desc:"60% win ₦8k, 40% lose ₦3k - EFCC fit catch you",icon:"💻",cash:8000,cashFail:-3000,energy:-20,rep:5,repFail:-2,risky:true},
+  {id:"okrika",name:"Sell Okrika Thrift",desc:"Profit ₦5k - Yabatech students dey buy",icon:"👕",cash:5000,energy:-20,rep:2},
+  {id:"go_lekki",name:"Go Lekki - Big Boys Area",desc:"Need 5 REP - Gateman dey check",icon:"🏃",cash:0,energy:-5,rep:0,next:"Lekki",needRep:5}
+ ]},
+ Lekki:{desc:"Lekki Phase 1! Range Rover dey pass. Owambe loading! Big boys dey spray money!",bg:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800",img:AV.male,activities:[
+  {id:"owambe",name:"Spray For Owambe",desc:"Spray ₦10k → +10 REP - Big boys notice you",icon:"🕺",cash:-10000,energy:-10,rep:10,needCash:10000},
+  {id:"pitch",name:"Pitch Business to Big Man",desc:"Get ₦20k investment",icon:"💼",cash:20000,energy:-10,rep:8},
+  {id:"selfcon",name:"View Selfcontain",desc:"Agent: 800k + 200k agreement + 100k commission = 1.1M!",icon:"🏠",cash:0,energy:0,rep:0,isInfo:true,info:"Agent: Oga bring 800k + 200k agreement + 100k commission = 1.1M! You need save!"},
+  {id:"back_oju",name:"Back to Ojuelegba",desc:"Go hustle again",icon:"🚐",cash:0,energy:-5,rep:0,next:"Ojuelegba"}
+ ]}
+};
+
+function getLocs(){return customActivities||DEFAULT_LOCS;}
+
+function save(){localStorage.setItem('ekoSaveV2',JSON.stringify(state));localStorage.setItem('ekoUser',JSON.stringify(user));if(customActivities)localStorage.setItem('ekoCustomActivities',JSON.stringify(customActivities));}
+function addLog(m){state.logs.unshift(m);if(state.logs.length>30)state.logs.pop();save();renderGame();}
+function setBg(loc){document.getElementById('bgImg').style.backgroundImage="url('"+getLocs()[loc].bg+"')";}
+
+function showLogin(){
+ document.getElementById('app').innerHTML=`
+ <div class="card" style="text-align:center">
+   <h2>🎬 EKO HUSTLE</h2><p style="color:gold;font-weight:800">Lagos Lifestyle • From Danfo to Lambo</p>
+   <p style="font-size:13px;color:#aaa;margin:8px 0">Sign up once. Log out anytime — your hustle saves and you continue where you left!</p>
+   <input id="nameIn" placeholder="Your Street Name e.g. Beecee">
+   <input id="phoneIn" placeholder="Phone (optional)">
+   <p style="text-align:left;margin-top:10px;font-weight:800">Choose Your Real Face (Lagos Hustler):</p>
+   <div style="display:flex;gap:12px;margin:10px 0"><img id="pM" src="${AV.male}" style="width:70px;height:70px;border-radius:50%;border:3px solid gold;cursor:pointer" class="sel" onclick="pick('male')"><img id="pF" src="${AV.female}" style="width:70px;height:70px;border-radius:50%;border:3px solid transparent;cursor:pointer" onclick="pick('female')"></div>
+   <button class="btn btn-primary" onclick="doSignup()">Enter Lagos →</button>
+   <p style="font-size:11px;color:#666;margin-top:8px">Motion background • Real Lagos faces • Progress saves automatically</p>
+ </div>`;
+ window.chosen='male';
+ window.pick=(g)=>{window.chosen=g;document.getElementById('pM').style.borderColor=g=='male'?'gold':'transparent';document.getElementById('pF').style.borderColor=g=='female'?'gold':'transparent';};
+ window.doSignup=()=>{ playSound('audioClick');const n=document.getElementById('nameIn').value.trim();if(!n){alert('Enter street name!');return}user={name:n,phone:document.getElementById('phoneIn').value,avatar:window.chosen,joined:Date.now()};state={day:1,cash:15000,energy:100,rep:0,location:"Ojuelegba",logs:["> "+n+" waka enter Lagos! Eko oni baje!"]};save();renderGame();};
+}
+
+function renderGame(){
+ if(!user||!state){showLogin();return}
+ setBg(state.location);
+ const L=getLocs()[state.location];
+ document.getElementById('day').textContent=state.day;
+ document.getElementById('locTop').textContent=state.location;
+ document.getElementById('app').innerHTML=`
+ <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+   <div style="display:flex;align-items:center;gap:10px"><img src="${user.avatar=='male'?AV.male:AV.female}" class="avatar"><div><b>${user.name}</b><div style="font-size:11px;color:#aaa">📍 ${state.location} • Day ${state.day}</div></div></div>
+   <button class="btn-secondary" style="padding:8px 14px;border-radius:20px;font-size:12px;font-weight:800" onclick="doLogout()">Log Out</button>
+ </div>
+ <div class="card"><div class="stats"><div class="stat"><span>💰 CASH</span><b>₦${state.cash.toLocaleString()}</b></div><div class="stat"><span>⚡ ENERGY</span><b>${state.energy}%</b><div class="energyBar"><div class="energyFill" style="width:${state.energy}%"></div></div></div><div class="stat"><span>⭐ REP</span><b>${state.rep}</b></div></div></div>
+ <div id="adminPanel">
+   <h3>👑 CREATOR ADMIN DASHBOARD</h3><p style="font-size:11px;color:gold">Secret: beecee2026 • Control & Edit ALL Activities</p>
+   <div style="margin:8px 0"><span class="adminTab active" onclick="switchTab('quick',this)">Quick Control</span><span class="adminTab" onclick="switchTab('edit',this)">Edit Activities</span><span class="adminTab" onclick="switchTab('create',this)">Create New Hustle</span><span class="adminTab" onclick="switchTab('players',this)">Players Data</span></div>
+   <div id="tab-quick">
+     <div style="display:flex;flex-wrap:wrap"><button class="adminBtn" onclick="addM(1000000)">+ ₦1M</button><button class="adminBtn" onclick="addM(10000000)">+ ₦10M</button><button class="adminBtn" onclick="addM(1000000000)">+ ₦1B</button><button class="adminBtn" onclick="state.rep+=20;save();addLog('> CREATOR: +20 REP')">+20 REP</button><button class="adminBtn" onclick="state.energy=100;save();renderGame()">Full Energy</button><button class="adminBtn" onclick="if(confirm('Reset game?')){localStorage.clear();location.reload()}">Reset All</button></div>
+     <div style="margin-top:10px;background:#111;border-radius:8px;padding:8px;font-size:11px">Current Player: ${user.name} | Cash: ₦${state.cash.toLocaleString()} | Day: ${state.day} | Location: ${state.location} | REP: ${state.rep}</div>
+   </div>
+   <div id="tab-edit" style="display:none">
+     <p style="font-size:12px;color:#aaa">Edit existing hustle activities (change money, energy, REP):</p>
+     <select id="editLoc" onchange="loadEditActivities()"><option value="Ojuelegba">Ojuelegba</option><option value="Yaba">Yaba</option><option value="Lekki">Lekki</option></select>
+     <div id="editList"></div>
+   </div>
+   <div id="tab-create" style="display:none">
+     <p style="font-size:12px;color:#aaa">Create new hustle activity for Lagos lifestyle:</p>
+     <select id="newLoc"><option value="Ojuelegba">Ojuelegba</option><option value="Yaba">Yaba</option><option value="Lekki">Lekki</option></select>
+     <input id="newName" placeholder="Activity name e.g. Sell Puff Puff">
+     <input id="newDesc" placeholder="Description e.g. Fry puff puff for students">
+     <input id="newIcon" placeholder="Icon emoji e.g. 🍩" maxlength="3">
+     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"><input id="newCash" type="number" placeholder="Cash (e.g. 3000)"><input id="newEnergy" type="number" placeholder="Energy -10"><input id="newRep" type="number" placeholder="REP 2"></div>
+     <input id="newNext" placeholder="Next location (optional e.g. Lekki) - leave empty if stay">
+     <button class="btn btn-primary" onclick="createActivity()">Create Hustle Activity</button>
+     <button class="btn btn-secondary" onclick="resetToDefault()">Reset to Default Lagos Activities</button>
+   </div>
+   <div id="tab-players" style="display:none">
+     <div style="background:#111;border-radius:8px;padding:8px;font-size:11px">Player: ${user.name}<br>Phone: ${user.phone||'N/A'}<br>Joined: ${new Date(user.joined).toLocaleString()}<br>Location: ${state.location}<br>Cash: ₦${state.cash.toLocaleString()}<br>REP: ${state.rep}<br>Day: ${state.day}<br>Logs: ${state.logs.length} actions</div>
+     <button class="btn btn-secondary" onclick="exportData()">Export Player Data</button>
+   </div>
+ </div>
+ <div class="card"><div style="display:flex;gap:10px;align-items:center"><img src="${L.img}" style="width:64px;height:64px;border-radius:12px;object-fit:cover;border:2px solid gold"><div><div style="font-size:18px;font-weight:900">📍 ${state.location}</div><div style="color:#aaa;font-size:12px">${L.desc}</div></div></div><div id="choices" style="margin-top:12px"></div></div>
+ <div class="card"><h3>📒 Street Log 🎬</h3><div class="log" id="logBox">${state.logs.map(l=>`<div>${l}</div>`).join('')}</div><button class="btn btn-secondary" onclick="sleep()">😴 Sleep → Next Day (Save)</button></div>
+ <div class="card"><h3>⭐ Player Reviews (Help Upgrade!)</h3><p style="font-size:11px;color:#aaa">Rate the game - your review helps us upgrade!</p><select id="reviewStars" style="width:80px"><option value="5">⭐⭐⭐⭐⭐ 5</option><option value="4">⭐⭐⭐⭐ 4</option><option value="3">⭐⭐⭐ 3</option><option value="2">⭐⭐ 2</option><option value="1">⭐ 1</option></select><textarea id="reviewText" placeholder="What you like? What we fit add? E.g. Add more danfo sound, add Makoko area..."></textarea><button class="btn btn-primary" onclick="submitReview()">Submit Review →</button><div id="reviewsBox" style="margin-top:8px"></div></div>
+ <div class="card" style="text-align:center"><h3>🔥 EKO HUSTLE - Share</h3><p style="color:#aaa;font-size:12px">beeceetechstudyacademy.github.io/Eko-Hustle/</p><button class="btn btn-primary" onclick="navigator.clipboard.writeText('https://beeceetechstudyacademy.github.io/Eko-Hustle/')">Copy Game Link</button><p style="font-size:10px;color:#666;margin-top:6px">Creator Admin: ?admin=beecee2026 • Tap logo 7x</p></div>
+ `;
+ if(window.location.search.includes('admin=beecee2026'))document.getElementById('adminPanel').style.display='block';
+ const box=document.getElementById('choices');
+ L.activities.forEach(act=>{
+   const b=document.createElement('button');b.className='choice';
+   b.innerHTML=`<div style="font-size:22px">${act.icon||'🔥'}</div><img src="${L.img}"><div style="flex:1"><b>${act.name}</b><div style="font-size:11px;color:#aaa">${act.desc}</div><div style="font-size:10px;color:gold">₦${act.cash>=0?'+'+act.cash:act.cash} | ⚡${act.energy>=0?'+'+act.energy:act.energy} | ⭐${act.rep>=0?'+'+act.rep:act.rep}</div></div>`;
+   b.onclick=()=>{
+     if(act.needRep && state.rep < act.needRep){playSound('audioDanfo'); addLog('> Gateman stop you! Need '+act.needRep+' REP! Current: '+state.rep);return}
+     if(act.needCash && state.cash < act.needCash){addLog('> No money! Need ₦'+act.needCash);return}
+     if(act.isInfo){addLog('> '+act.info);return}
+     if(act.risky && Math.random()<0.4){
+       state.cash=Math.max(0,state.cash+(act.cashFail||0));
+       state.energy=Math.max(0,Math.min(100,state.energy+(act.energy||0)));
+       state.rep=Math.max(0,state.rep+(act.repFail||0));
+       addLog('> '+act.name+' failed! Lost ₦'+Math.abs(act.cashFail||0));
+     } else {
+       if(state.cash+act.cash<0){addLog('> No money for this!');return}
+       playSound(act.cash>0?'audioCash':'audioClick'); state.cash+=act.cash;state.energy=Math.max(0,Math.min(100,state.energy+act.energy));state.rep=Math.max(0,state.rep+act.rep);
+       addLog('> '+act.name+': '+(act.cash>=0?'+₦'+act.cash:'-₦'+Math.abs(act.cash))+' '+(act.desc||''));
+     }
+     if(act.next)state.location=act.next;
+     save();renderGame();
+   };
+   box.appendChild(b);
+ });
+ loadEditActivities(); renderReviews();
+}
+
+function switchTab(name,el){
+ document.querySelectorAll('[id^=tab-]').forEach(d=>d.style.display='none');
+ document.getElementById('tab-'+name).style.display='block';
+ document.querySelectorAll('.adminTab').forEach(t=>t.classList.remove('active'));
+ el.classList.add('active');
+}
+function loadEditActivities(){
+ const loc=document.getElementById('editLoc')?.value||'Ojuelegba';
+ const list=document.getElementById('editList');
+ if(!list)return;
+ const acts=getLocs()[loc].activities;
+ list.innerHTML=acts.map((a,i)=>`
+ <div style="background:#111;border-radius:8px;padding:8px;margin:6px 0;font-size:11px">
+   <b>${a.icon} ${a.name}</b><br>
+   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:4px">
+     <input id="eCash${i}" type="number" value="${a.cash}" placeholder="Cash">
+     <input id="eEnergy${i}" type="number" value="${a.energy}" placeholder="Energy">
+     <input id="eRep${i}" type="number" value="${a.rep}" placeholder="REP">
+   </div>
+   <button style="margin-top:4px;padding:6px 10px;background:gold;color:#000;border:none;border-radius:6px;font-size:11px;font-weight:800" onclick="saveEdit('${loc}',${i})">Save</button>
+   <button style="margin-top:4px;padding:6px 10px;background:#333;color:#fff;border:none;border-radius:6px;font-size:11px" onclick="deleteActivity('${loc}',${i})">Delete</button>
+ </div>`).join('');
+}
+function saveEdit(loc,idx){
+ if(!customActivities)customActivities=JSON.parse(JSON.stringify(DEFAULT_LOCS));
+ const c=document.getElementById('eCash'+idx), e=document.getElementById('eEnergy'+idx), r=document.getElementById('eRep'+idx);
+ customActivities[loc].activities[idx].cash=parseInt(c.value)||0;
+ customActivities[loc].activities[idx].energy=parseInt(e.value)||0;
+ customActivities[loc].activities[idx].rep=parseInt(r.value)||0;
+ save();addLog('> CREATOR: Edited '+customActivities[loc].activities[idx].name+' - Now ₦'+c.value);renderGame();document.getElementById('adminPanel').style.display='block';
+}
+function deleteActivity(loc,idx){
+ if(!customActivities)customActivities=JSON.parse(JSON.stringify(DEFAULT_LOCS));
+ if(confirm('Delete '+customActivities[loc].activities[idx].name+'?')){customActivities[loc].activities.splice(idx,1);save();renderGame();document.getElementById('adminPanel').style.display='block';}
+}
+function createActivity(){
+ const loc=document.getElementById('newLoc').value;
+ const name=document.getElementById('newName').value.trim();
+ const desc=document.getElementById('newDesc').value.trim();
+ const icon=document.getElementById('newIcon').value.trim()||'🔥';
+ const cash=parseInt(document.getElementById('newCash').value)||0;
+ const energy=parseInt(document.getElementById('newEnergy').value)||0;
+ const rep=parseInt(document.getElementById('newRep').value)||0;
+ const next=document.getElementById('newNext').value.trim();
+ if(!name){alert('Enter activity name!');return}
+ if(!customActivities)customActivities=JSON.parse(JSON.stringify(DEFAULT_LOCS));
+ customActivities[loc].activities.push({id:'custom_'+Date.now(),name,desc,icon,cash,energy,rep,next:next||null});
+ save();addLog('> CREATOR: Created new hustle "'+name+'" for '+loc+' - ₦'+cash);renderGame();document.getElementById('adminPanel').style.display='block';
+ // clear inputs
+ document.getElementById('newName').value='';document.getElementById('newDesc').value='';document.getElementById('newIcon').value='';document.getElementById('newCash').value='';document.getElementById('newEnergy').value='';document.getElementById('newRep').value='';document.getElementById('newNext').value='';
+}
+function resetToDefault(){if(confirm('Reset all Lagos activities to default? This deletes your custom hustles!')){customActivities=null;localStorage.removeItem('ekoCustomActivities');addLog('> CREATOR: Reset to default Lagos activities!');renderGame();document.getElementById('adminPanel').style.display='block';}}
+function sleep(){state.day++;state.energy=100;save();state.logs.unshift('> New day! Day '+state.day+' - Progress saved!');save();renderGame();}
+function addM(a){state.cash+=a;save();state.logs.unshift('> CREATOR: Added ₦'+a.toLocaleString()+'! You don blow!');save();renderGame();}
+function doLogout(){save();document.getElementById('app').innerHTML=`<div class="card" style="text-align:center"><img src="${user.avatar=='male'?AV.male:AV.female}" class="avatar" style="width:80px;height:80px"><h2>Bye ${user.name}!</h2><p style="color:#aaa">You left at ${state.location} Day ${state.day} with ₦${state.cash.toLocaleString()}</p><p style="font-size:13px;color:gold;margin:8px 0">✅ Progress saved! When you login again, you continue where you left!</p><button class="btn btn-primary" onclick="renderGame()">Continue Hustle →</button><button class="btn btn-secondary" onclick="localStorage.clear();location.reload()">Switch Player / New Signup</button></div>`}
+function exportData(){const data=JSON.stringify({user,state,customActivities},null,2);const blob=new Blob([data],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='eko_hustle_'+user.name+'.json';a.click();}
+if(!user)showLogin();else if(!state){state={day:1,cash:15000,energy:100,rep:0,location:"Ojuelegba",logs:["> Welcome back "+user.name+"! Eko oni baje!"]};save();renderGame();}else renderGame();
+</script></body></html>
